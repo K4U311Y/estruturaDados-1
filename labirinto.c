@@ -3,61 +3,68 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef unsigned int uint;
 
-typedef struct _no{
-    char info;
-    unsigned int i, j;
-    struct _no *prox;
-}TNo;
-TNo* TNo_createNFill(char, unsigned int, unsigned int);
-
-struct _list{
-    TNo* inicio;
-    unsigned int n, m;
-};
-
-TLinkedList* list_create(unsigned int n, unsigned int m){
-    TLinkedList* nova = malloc(sizeof(TLinkedList));
-    if(nova){
-        nova->inicio = NULL;
-        nova->n = n;
-        nova->m = m;
+/*
+pq usar o malloc? quando fui criar a matriz para o labirinto o código deu erro, depois de pesquisar sobre o erro
+vi que, ou eu colocava o segundo valor da matriz [][esse], como um valor pré definido ou eu usava ponteiro e malloc
+acabei optando por essa opção pois o professor disse que o código teria que funcionar com um labirinto de qualquer 
+tamanho
+*/
+char** alocar_matriz (uint n, uint m){
+    char** labirinto = malloc (n * sizeof(char*));
+    if (!labirinto) 
+        return NULL;
+    
+        for (uint i = 0; i < n; i++) {
+            labirinto[i] = malloc(m * sizeof(char));
+            if (!labirinto[i]) {
+                // desaloca tudo em caso de erro
+                for (uint j = 0; j < i; j++) free(labirinto[j]);
+                free(labirinto);
+                return NULL;
+        }
     }
-    return nova;
+    return labirinto;
 }
 
-bool list_insert_end(TLinkedList* lista, char info, unsigned int i, unsigned int j){
-    TNo* novo = TNo_createNFill(info, i , j);
-    if(novo == NULL) return false;
-    //A lista está vazia?
-    if(lista->inicio == NULL)
-        lista->inicio = novo;
-    else{
-        //Lista nao vazia, temos que encontrar o último elemento
-        TNo* aux = lista->inicio;
-        while(aux->prox!=NULL)
-            aux = aux->prox;
-        aux->prox = novo;
+void liberar_matriz(char** matriz, uint n) {
+    for (uint i = 0; i < n; i++) {
+        free(matriz[i]);
     }
-    return true;
+    free(matriz);
 }
 
-void list_print(TLinkedList* lista){
-    TNo* aux = lista->inicio;
-    while(aux!=NULL){
-        printf("%c", aux->info);
-        aux = aux->prox;
+int matriz_print(char** list, uint n, uint m){
+    for (uint i = 0; i < n; i++) {
+        for (uint j = 0; j < m; j++) {
+            printf("%c ", list[i][j]);
+        }
+        printf("\n");
     }
-    putchar('\n');
+
+    return 0;
 }
 
-TNo* TNo_createNFill(char info, unsigned int i, unsigned int j){
-    TNo* novo = malloc(sizeof(TNo));
-    if(novo){
-        novo->info = info;
-        novo->i = i;
-        novo->j = j;
-        novo->prox = NULL;
+bool criar_matrizLab (char** labirinto, uint n, uint m){
+
+    FILE* f = fopen("labirinto.txt", "r");
+    if(f){
+        uint n, m;
+        if(fscanf(f, "%u %u", &n, &m) == 2){
+            for (uint i = 0; i < n; i++) {
+                for (uint j = 0; j < m; j++) {
+                    labirinto[i][j] = fgetc(f);
+                }
+                fgetc(f); // consome o '\n' ao fim da linha
+            }
+            fclose(f);
+        }else{
+            puts("Erro ao ler o numero de linhas e colunas da primeira linha");
+        }
+    }else{
+        puts("Houve um problema ao abrir o arquivo input1.txt");
     }
-    return novo;
 }
+
+

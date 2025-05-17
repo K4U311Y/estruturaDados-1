@@ -9,7 +9,7 @@ char movimento_aleatorio() {
 }
 
 int calcular_distancia_manhattan(Posicao a, Posicao b) {
-    return abs((int)a.i - (int)b.i) + abs((int)a.j - (int)b.j); //o abs é módilo, ou seja, a distância sempre vai dar positiva
+    return abs((int)a.i - (int)b.i) + abs((int)a.j - (int)b.j); //o abs é módulo, ou seja, a distância sempre vai dar positiva
 }
 
 TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
@@ -68,9 +68,7 @@ Posicao simular_movimentos(const Labirinto* lab, TSList* caminho) {
             default: continue; // Movimento inválido
         }
         
-        if(proxima.i < n && proxima.j < m && 
-           proxima.i >= 0 && proxima.j >= 0 && 
-           lab->labirinto[proxima.i][proxima.j] != '#') {
+        if(proxima.i < n && proxima.j < m && proxima.i >= 0 && proxima.j >= 0 && lab->labirinto[proxima.i][proxima.j] != '#') {
             atual = proxima;
         }
     }
@@ -109,7 +107,6 @@ void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
         atual = atual->prox;
     }
 }
-
 
 void liberar_populacao(TLinkedList* populacao) {
     if(!populacao) return;

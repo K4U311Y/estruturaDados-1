@@ -37,7 +37,6 @@ bool list_insert_end(TLinkedList* lista, Individuo info) {
     return true;
 }
 
-
 void list_print(TLinkedList* lista){
     if(!lista) return;
     

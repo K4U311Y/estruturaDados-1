@@ -1,35 +1,17 @@
 
-#include "List.h"
+#include "labirinto.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MAX 2
+TNo* TNo_createNFill(Individuo);
 
-typedef struct _no{
-    int info;
-    struct _no *prox;
-}TNo;
-
-TNo* TNo_createNFill(int);
-
-struct _list{
-    TNo* inicio;
-};
-
-struct _listS{
-    unsigned int qty;
-    int data[MAX];
- };
-
-TLinkedList* list_create(){
+TLinkedList* list_create() {
     TLinkedList* nova = malloc(sizeof(TLinkedList));
-    if(nova){
-        nova->inicio = NULL;
-    }
+    if(nova) nova->inicio = NULL;
     return nova;
 }
 
-bool list_insert_begin(TLinkedList* lista, int info){
+bool list_insert_begin(TLinkedList* lista, Individuo info){
     TNo* novo = TNo_createNFill(info);
     if(novo == NULL) return false;
     if(lista->inicio != NULL)
@@ -38,17 +20,18 @@ bool list_insert_begin(TLinkedList* lista, int info){
     return true;
 }
 
-bool list_insert_end(TLinkedList* lista, int info){
-    TNo* novo = TNo_createNFill(info);
-    if(novo == NULL) return false;
-    //A lista está vazia?
-    if(lista->inicio == NULL)
+bool list_insert_end(TLinkedList* lista, Individuo info) {
+    TNo* novo = malloc(sizeof(TNo));
+    if(!novo) return false;
+    
+    novo->info = info;
+    novo->prox = NULL;
+
+    if(lista->inicio == NULL) {
         lista->inicio = novo;
-    else{
-        //Lista nao vazia, temos que encontrar o último elemento
+    } else {
         TNo* aux = lista->inicio;
-        while(aux->prox!=NULL)
-            aux = aux->prox;
+        while(aux->prox != NULL) aux = aux->prox;
         aux->prox = novo;
     }
     return true;
@@ -56,15 +39,17 @@ bool list_insert_end(TLinkedList* lista, int info){
 
 
 void list_print(TLinkedList* lista){
+    if(!lista) return;
+    
     TNo* aux = lista->inicio;
-    while(aux!=NULL){
-        printf("[%d]->", aux->info);
+    while(aux != NULL){
+        printf("[Fitness: %d]->", aux->info.fitness);
         aux = aux->prox;
     }
     putchar('\n');
 }
 
-TNo* TNo_createNFill(int info){
+TNo* TNo_createNFill(Individuo info){
     TNo* novo = malloc(sizeof(TNo));
     if(novo){
         novo->info = info;
@@ -99,37 +84,29 @@ bool list_delete_begin(TLinkedList* lista){
     return true;
 }
 
-bool list_delete_n(TLinkedList* lista, unsigned int n){
-    while(n-->0){
-        if(!list_delete_begin(lista))
-            return false;
-    }
-    return true;
-}
-
-TSList* TSList_create(){
+TSList* TSList_create() {
     TSList *novo = malloc(sizeof(TSList));
-    //Definindo o estado de uma lista vazia
-    if(novo)
-        novo->qty = 0;
+    if(novo) novo->qty = 0;
     return novo;
 }
 
-bool TSList_insert(TSList* lista, int valor){
-    if(lista == NULL) return false;
-    if(!TSList_is_full(lista)){
-        lista->data[lista->qty] = valor;
-        lista->qty++;
-        return true;
-    }
-    return false;
+bool TSList_insert(TSList* lista, char valor) {
+    if(lista == NULL || TSList_is_full(lista)) return false;
+    lista->data[lista->qty++] = valor;
+    return true;
 }
 
 void TSList_print(TSList* lista){
-    if(lista!=NULL)
-        for(int i=0; i<lista->qty; i++)
-            printf("%d, ", lista->data[i]);
-    putchar('\n');
+    if(lista == NULL) return;
+    
+    printf("[");
+    for(int i = 0; i < lista->qty; i++) {
+        printf("%c", lista->data[i]);
+        if(i < lista->qty - 1) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
 }
 
 unsigned int TSList_qty(TSList* lista){
@@ -146,6 +123,10 @@ bool TSList_is_empty(TSList* lista){
 
 bool TSList_is_full(TSList* lista){
     if(lista!=NULL)
-        return lista->qty == MAX;
+        return lista->qty == 100;
     return false;
+}
+
+void TSList_free(TSList* lista) {
+    if(lista) free(lista);
 }

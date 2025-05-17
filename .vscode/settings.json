@@ -57,6 +57,7 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
-    "labirinto.h": "c"
+    "labirinto.h": "c",
+    "time.h": "c"
   }
 }

@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef unsigned int uint;
-
 /*
 pq usar o malloc? quando fui criar a matriz para o labirinto o código deu erro, depois de pesquisar sobre o erro
 vi que, ou eu colocava o segundo valor da matriz [][esse], como um valor pré definido ou eu usava ponteiro e malloc
@@ -38,7 +36,7 @@ void liberar_matriz(char** matriz, uint n) {
 int matriz_print(char** list, uint n, uint m){
     for (uint i = 0; i < n; i++) {
         for (uint j = 0; j < m; j++) {
-            printf("%c ", list[i][j]);
+            printf("%c", list[i][j]);
         }
         printf("\n");
     }
@@ -46,25 +44,64 @@ int matriz_print(char** list, uint n, uint m){
     return 0;
 }
 
-bool criar_matrizLab (char** labirinto, uint n, uint m){
+// Modificar a função para receber FILE*
+bool criar_matrizLab(char** labirinto, uint n, uint m, FILE* f) {
+    if (!f) return false;
 
-    FILE* f = fopen("labirinto.txt", "r");
-    if(f){
-        uint n, m;
-        if(fscanf(f, "%u %u", &n, &m) == 2){
-            for (uint i = 0; i < n; i++) {
-                for (uint j = 0; j < m; j++) {
-                    labirinto[i][j] = fgetc(f);
-                }
-                fgetc(f); // consome o '\n' ao fim da linha
+    for (uint i = 0; i < n; i++) {
+        for (uint j = 0; j < m; j++) {
+            int c = fgetc(f);
+            // Remove tratamento extra de newline que pode pular caracteres válidos
+            if (c == EOF) {
+                return false;
             }
-            fclose(f);
-        }else{
-            puts("Erro ao ler o numero de linhas e colunas da primeira linha");
+            labirinto[i][j] = (char)c;
         }
-    }else{
-        puts("Houve um problema ao abrir o arquivo input1.txt");
+        // Pular newline no final de cada linha
+        if (fgetc(f) != '\n' && !feof(f)) {
+            return false;
+        }
     }
+    return true;
+}
+
+bool encontrar_posicoes_SE(char** labirinto, uint n, uint m, Posicao* inicio, Posicao* saida) {
+    bool encontrouS = false, encontrouE = false;
+    
+    for(uint i = 0; i < n; i++) {
+        for(uint j = 0; j < m; j++) {
+            if(labirinto[i][j] == 'S') {
+                inicio->i = i;
+                inicio->j = j;
+                encontrouS = true;
+            }
+            if(labirinto[i][j] == 'E') {
+                saida->i = i;
+                saida->j = j;
+                encontrouE = true;
+            }
+        }
+    }
+    
+    return encontrouS && encontrouE;
+}
+
+// Criar uma vez e reutilizar
+Labirinto* criar_contexto(char** labirinto, uint n, uint m, int penalidade) {
+    Labirinto* lab = malloc(sizeof(Labirinto));
+    if (!lab) return NULL;
+    
+    lab->labirinto = labirinto;
+    lab->n = n;
+    lab->m = m;
+    lab->penalidade = penalidade;
+    
+    if (!encontrar_posicoes_SE(labirinto, n, m, &lab->inicio, &lab->saida)) {
+        free(lab);
+        return NULL;
+    }
+    
+    return lab;
 }
 
 

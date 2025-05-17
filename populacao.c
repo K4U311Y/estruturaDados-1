@@ -12,16 +12,13 @@ int calcular_distancia_manhattan(Posicao a, Posicao b) {
     return abs((int)a.i - (int)b.i) + abs((int)a.j - (int)b.j); //o abs é módilo, ou seja, a distância sempre vai dar positiva
 }
 
-TLinkedList* criar_populacao(Labirinto* lab) {
+TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
     if(!lab) return NULL;
     
     int dist = calcular_distancia_manhattan(lab->inicio, lab->saida);
-    //if(dist <= 0) dist = 10; // Valor padrão se distância inválida
     
     TLinkedList* populacao = list_create();
     if(!populacao) return NULL;
-
-    const int tamanho_populacao = 100;
 
     for(int i = 0; i < tamanho_populacao; i++) {
         Individuo ind = {
@@ -52,6 +49,32 @@ TLinkedList* criar_populacao(Labirinto* lab) {
         }
     }
     return populacao;
+}
+
+Posicao simular_movimentos(const Labirinto* lab, TSList* caminho) {
+    if(!lab || !caminho) return lab->inicio;
+    
+    Posicao atual = lab->inicio;
+    const uint n = lab->n, m = lab->m;
+
+    for(uint i = 0; i < caminho->qty; i++) {
+        Posicao proxima = atual;
+        
+        switch(caminho->data[i]) {
+            case 'C': proxima.i--; break;
+            case 'B': proxima.i++; break;
+            case 'E': proxima.j--; break;
+            case 'D': proxima.j++; break;
+            default: continue; // Movimento inválido
+        }
+        
+        if(proxima.i < n && proxima.j < m && 
+           proxima.i >= 0 && proxima.j >= 0 && 
+           lab->labirinto[proxima.i][proxima.j] != '#') {
+            atual = proxima;
+        }
+    }
+    return atual;
 }
 
 void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
@@ -87,31 +110,7 @@ void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
     }
 }
 
-Posicao simular_movimentos(const Labirinto* lab, TSList* caminho) {
-    if(!lab || !caminho) return lab->inicio;
-    
-    Posicao atual = lab->inicio;
-    const uint n = lab->n, m = lab->m;
 
-    for(uint i = 0; i < caminho->qty; i++) {
-        Posicao proxima = atual;
-        
-        switch(caminho->data[i]) {
-            case 'C': proxima.i--; break;
-            case 'B': proxima.i++; break;
-            case 'E': proxima.j--; break;
-            case 'D': proxima.j++; break;
-            default: continue; // Movimento inválido
-        }
-        
-        if(proxima.i < n && proxima.j < m && 
-           proxima.i >= 0 && proxima.j >= 0 && 
-           lab->labirinto[proxima.i][proxima.j] != '#') {
-            atual = proxima;
-        }
-    }
-    return atual;
-}
 void liberar_populacao(TLinkedList* populacao) {
     if(!populacao) return;
     
@@ -137,7 +136,6 @@ void print_populacao(TLinkedList* populacao) {
     while(atual != NULL) {  // Verificação explícita
         printf("Individuo %d:\n", contador++);
         printf("  Tamanho do caminho: %d\n", atual->info.tamanho_caminho);
-        printf("  Fitness: %d\n", atual->info.fitness);
         printf("  Caminho: [");
         
         for(uint i = 0; i < atual->info.caminho->qty; i++) {
@@ -183,12 +181,10 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
         }
     }
 
-    // Cálculo da distância MANHATTAN (mais adequada para labirintos)
+    // Cálculo da distância MANHATTANs
     int distancia = calcular_distancia_manhattan(atual, lab->saida);
 
-
     // Cálculo do fitness
-    // Quanto menor a distância e menos colisões, melhor o fitness
     int fitness = 1000 - distancia - (colisoes * lab->penalidade);
     indiv->fitness = (fitness > 0) ? fitness : 0;
 }

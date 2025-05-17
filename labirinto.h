@@ -56,14 +56,14 @@ char** alocar_matriz(uint, uint);
 void liberar_matriz(char**, uint);
 
 /**
- * Imprime uma matriz de caracteres no console.
- * Por exemplo, imprime o labirinto no mesmo formato do arquivo de entrada.
- * @param char** matriz a ser impressa
- * @param uint número de linhas
- * @param uint número de colunas
- * @return int 0 em caso de sucesso
+ * @brief Exibe informações completas sobre o labirinto carregado
+ * 
+ * @param char** Matriz de caracteres representando o labirinto
+ * @param uint Número de linhas do labirinto
+ * @param uint Número de colunas do labirinto
+ * @param Labirinto* Ponteiro para a estrutura Labirinto com metadados
  */
-int matriz_print(char**, uint, uint);
+int labirinto_print(char**, uint, uint, const Labirinto*);
 
 /**
  * Carrega um labirinto a partir de um arquivo já aberto para a matriz.
@@ -79,10 +79,11 @@ bool criar_matrizLab(char**, uint, uint, FILE*);
  * Cria uma população inicial de indivíduos com caminhos aleatórios.
  * Por exemplo, gera uma população com tamanho baseado na distância de Manhattan.
  * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
+ * @param uint - tamanho da população dado pelo usuário
  * @return TLinkedList* - lista encadeada contendo a população ou NULL em caso de erro
  * @see calcular_distancia_manhattan(), TSList_create(), list_create()
  */
-TLinkedList* criar_populacao(Labirinto*);
+TLinkedList* criar_populacao(Labirinto*, uint);
 
 /**
  * Gera um movimento aleatório válido para o caminho.
@@ -96,22 +97,21 @@ char movimento_aleatorio();
  * Por exemplo, libera todos os indivíduos e seus caminhos.
  * @param TLinkedList* ponteiro para a lista de população
  */
-void liberar_populacao(TLinkedList* populacao);
+void liberar_populacao(TLinkedList*);
 
 /**
  * Imprime toda a população no console, mostrando cada indivíduo com seu caminho e fitness.
  * Por exemplo, imprime "Indivíduo 1: Caminho: [C, B, E], Fitness: 10".
  * @param TLinkedList* ponteiro para a lista de população
  */
-void print_populacao(TLinkedList* populacao);
-
+void print_populacao(TLinkedList*);
 
 /**
  * Simula o movimento de um indivíduo no labirinto e retorna sua posição final.
  * @param char** labirinto - matriz do labirinto
  * @param uint n - número de linhas
  * @param uint m - número de colunas
- * @param TSList* caminho - lista de movimentos do indivíduo
+ * @param TSList* caminho - listda de movimentos do inivíduo
  * @param Posicao inicio - posição inicial (S)
  * @return Posicao - posição final após aplicar os movimentos
  */

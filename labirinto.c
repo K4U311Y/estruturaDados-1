@@ -33,13 +33,17 @@ void liberar_matriz(char** matriz, uint n) {
     free(matriz);
 }
 
-int matriz_print(char** list, uint n, uint m){
+int labirinto_print(char** list, uint n, uint m, const Labirinto* lab){
     for (uint i = 0; i < n; i++) {
         for (uint j = 0; j < m; j++) {
             printf("%c", list[i][j]);
         }
         printf("\n");
     }
+    printf("=== LABIRINTO CARREGADO ===\n");
+    printf("\nDimensoes: %ux%u\n", n, m);
+    printf("Posicao inicial (S): (%u, %u)\n", lab->inicio.i, lab->inicio.j);
+    printf("Posicao destino (E): (%u, %u)\n", lab->saida.i, lab->saida.j);
 
     return 0;
 }

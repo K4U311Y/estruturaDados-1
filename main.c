@@ -23,10 +23,7 @@ int main() {
 
     // Alocação e leitura da matriz
     char** labirinto = alocar_matriz(n, m);
-    if (!labirinto) {
-        fclose(file);
-        return 1;
-    }
+
 
     if (!criar_matrizLab(labirinto, n, m, file)) {
     fprintf(stderr, "Erro ao carregar labirinto do arquivo\n");
@@ -45,25 +42,28 @@ int main() {
     }
 
     // 3. Exibição do labirinto
-    printf("=== LABIRINTO CARREGADO ===\n");
-    matriz_print(labirinto, n, m);
-    printf("\nDimensoes: %ux%u\n", n, m);
-    printf("Posicao inicial (S): (%u, %u)\n", lab->inicio.i, lab->inicio.j);
-    printf("Posicao destino (E): (%u, %u)\n", lab->saida.i, lab->saida.j);
+    labirinto_print(labirinto, n, m, lab);
+
+    uint tamanho_populacao;
+    printf("Quantos individuos deseja que tenha na populacao?");
+    scanf ("%d", &tamanho_populacao);
+    getchar();
 
     // 4. Criação da população (já com fitness calculado)
-    TLinkedList* populacao = criar_populacao(lab);
+    TLinkedList* populacao = criar_populacao(lab, tamanho_populacao);
     if (!populacao) {
         fprintf(stderr, "Erro: Falha ao criar populacao\n");
         liberar_matriz(labirinto, n);
         return 1;
     }
 
+    // 5. printar a população
+    print_populacao(populacao);
 
-    // 5. Simulação e exibição dos resultados
+    // 6. Simulação e exibição dos resultados
     simular_populacao(lab, populacao);
 
-    // 6. Liberação de recursos
+    // 7. Liberação de recursos
     liberar_populacao(populacao);
     liberar_matriz(labirinto, n);
 

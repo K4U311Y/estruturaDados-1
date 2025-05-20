@@ -14,16 +14,18 @@ int calcular_distancia_manhattan(Posicao a, Posicao b) {
 
 TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
     if(!lab) return NULL;
-    
     int dist = calcular_distancia_manhattan(lab->inicio, lab->saida);
-    
     TLinkedList* populacao = list_create();
     if(!populacao) return NULL;
 
     for(int i = 0; i < tamanho_populacao; i++) {
         Individuo ind = {
             .caminho = TSList_create(),
-            .tamanho_caminho = dist + (rand() % (dist + 1)),
+            /*
+            Quando fazemos rand() % (dist + 1), os possíveis valores passam a ser: 0, 1, 2, ..., dist
+            o taminho pode ser o minimo = dist e o max de dist+dist
+            */
+            .tamanho_caminho = dist + (rand() % (dist + 1)), 
             .fitness = 0
         };
 
@@ -51,30 +53,6 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
     return populacao;
 }
 
-Posicao simular_movimentos(const Labirinto* lab, TSList* caminho) {
-    if(!lab || !caminho) return lab->inicio;
-    
-    Posicao atual = lab->inicio;
-    const uint n = lab->n, m = lab->m;
-
-    for(uint i = 0; i < caminho->qty; i++) {
-        Posicao proxima = atual;
-        
-        switch(caminho->data[i]) {
-            case 'C': proxima.i--; break;
-            case 'B': proxima.i++; break;
-            case 'E': proxima.j--; break;
-            case 'D': proxima.j++; break;
-            default: continue; // Movimento inválido
-        }
-        
-        if(proxima.i < n && proxima.j < m && proxima.i >= 0 && proxima.j >= 0 && lab->labirinto[proxima.i][proxima.j] != '#') {
-            atual = proxima;
-        }
-    }
-    return atual;
-}
-
 void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
     if(!lab || !populacao) {
         printf("Erro: Labirinto ou populacao invalidos\n");
@@ -90,7 +68,8 @@ void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
     int contador = 1;
     
     while(atual != NULL) {
-        Posicao final = simular_movimentos(lab, atual->info.caminho);
+        int colisoes = 0;
+        Posicao final = simular_movimentos(lab, atual->info.caminho, &colisoes);
         
         printf("Individuo %03d\n", contador++);
         printf("Posicao final: (%u, %u)\n", final.i, final.j);
@@ -147,41 +126,45 @@ void print_populacao(TLinkedList* populacao) {
     }
 }
 
+Posicao simular_movimentos(const Labirinto* lab, TSList* caminho, int* colisoes) {
+    if(!lab || !caminho) return lab->inicio;
+    
+    Posicao atual = lab->inicio;
+    int colisao = 0;
+
+    for(uint i = 0; i < caminho->qty; i++) {
+        Posicao proxima = atual;
+        
+        switch(caminho->data[i]) {
+            case 'C': proxima.i--; break;
+            case 'B': proxima.i++; break;
+            case 'E': proxima.j--; break;
+            case 'D': proxima.j++; break;
+            default: continue; // Movimento inválido
+        }
+        
+        if(proxima.i < lab->n && proxima.j < lab->m && proxima.i >= 0 && proxima.j >= 0 && lab->labirinto[proxima.i][proxima.j] != '#') {
+            atual = proxima;
+        }else colisao ++;
+    }
+    if (colisoes) *colisoes = colisao;
+    return atual;
+}
+
 void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
     // Verificações de segurança
     if(!lab || !indiv || !indiv->caminho || !lab->labirinto) {
         if(indiv) indiv->fitness = 0;
         return;
     }
-
-    // Simulação dos movimentos e contagem de colisões
-    Posicao atual = lab->inicio;
     int colisoes = 0;
-    const uint n = lab->n, m = lab->m;
-
-    for(uint i = 0; i < indiv->caminho->qty; i++) {
-        Posicao proxima = atual;
-        
-        switch(indiv->caminho->data[i]) {
-            case 'C': proxima.i--; break;
-            case 'B': proxima.i++; break;
-            case 'E': proxima.j--; break;
-            case 'D': proxima.j++; break;
-            default: continue;
-        }
-
-        if(proxima.i < n && proxima.j < m && 
-           lab->labirinto[proxima.i][proxima.j] != '#') {
-            atual = proxima;
-        } else {
-            colisoes++;
-        }
-    }
-
-    // Cálculo da distância MANHATTANs
+    Posicao atual = simular_movimentos(lab, indiv->caminho, &colisoes);
     int distancia = calcular_distancia_manhattan(atual, lab->saida);
-
-    // Cálculo do fitness
     int fitness = 1000 - distancia - (colisoes * lab->penalidade);
+    /*
+    Essa linha usa um operador ternário para garantir que o valor de fitness nunca seja negativo.
+    Se fitness for maior que 0, o valor é mantido.
+    Se falso (: 0) Se fitness for negativo ou zero, ele é substituído por 0.
+    */
     indiv->fitness = (fitness > 0) ? fitness : 0;
 }

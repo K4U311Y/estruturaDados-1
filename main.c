@@ -42,14 +42,14 @@ int main() {
     }
 
     // 3. Exibição do labirinto
-    labirinto_print(labirinto, n, m, lab);
+    labirinto_print(labirinto, lab);
 
     uint tamanho_populacao;
-    printf("Quantos individuos deseja que tenha na populacao?");
+    printf("Quantos individuos deseja que tenha na primeira populacao?");
     scanf ("%d", &tamanho_populacao);
     getchar();
 
-    // 4. Criação da população (já com fitness calculado)
+    // 4. Criação da população
     TLinkedList* populacao = criar_populacao(lab, tamanho_populacao);
     if (!populacao) {
         fprintf(stderr, "Erro: Falha ao criar populacao\n");

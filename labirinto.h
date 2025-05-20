@@ -8,7 +8,8 @@ typedef unsigned int uint;
 
 typedef struct _listS {
     unsigned int qty;
-    char data[100];
+    unsigned int capacidade;
+    char* data;
 } TSList;
 
 typedef struct _individuo {
@@ -59,18 +60,16 @@ void liberar_matriz(char**, uint);
  * @brief Exibe informações completas sobre o labirinto carregado
  * 
  * @param char** Matriz de caracteres representando o labirinto
- * @param uint Número de linhas do labirinto
- * @param uint Número de colunas do labirinto
  * @param Labirinto* Ponteiro para a estrutura Labirinto com metadados
  */
-int labirinto_print(char**, uint, uint, const Labirinto*);
+int labirinto_print(char**, const Labirinto*);
 
 /**
  * Carrega um labirinto a partir de um arquivo já aberto para a matriz.
- * @param labirinto Matriz destino (já alocada)
- * @param n Número de linhas da matriz
- * @param m Número de colunas da matriz
- * @param arquivo Ponteiro FILE* já aberto no modo leitura ("r")
+ * @param char** Matriz destino (já alocada)
+ * @param uint Número de linhas da matriz
+ * @param uint Número de colunas da matriz
+ * @param FILE Ponteiro para arquivo já aberto no modo leitura ("r")
  * @return bool true se o labirinto foi carregado com sucesso
  */
 bool criar_matrizLab(char**, uint, uint, FILE*);
@@ -108,14 +107,12 @@ void print_populacao(TLinkedList*);
 
 /**
  * Simula o movimento de um indivíduo no labirinto e retorna sua posição final.
- * @param char** labirinto - matriz do labirinto
- * @param uint n - número de linhas
- * @param uint m - número de colunas
+ * @param const Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
  * @param TSList* caminho - listda de movimentos do inivíduo
- * @param Posicao inicio - posição inicial (S)
+ * @param int* colisoes - ponteiro que calcula a quantidade de colisões para fazer o calculo do fitness
  * @return Posicao - posição final após aplicar os movimentos
  */
-Posicao simular_movimentos(const Labirinto*, TSList*);
+Posicao simular_movimentos(const Labirinto*, TSList*, int*);
 
 /**
  * Simula e avalia toda a população.
@@ -134,13 +131,12 @@ void simular_populacao(const Labirinto*, TLinkedList*);
 /**
  * Encontra as posições de 'S' (início) e 'E' (saída) no labirinto.
  * @param char** labirinto - matriz do labirinto
- * @param uint n - número de linhas
- * @param uint m - número de colunas
+ * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
  * @param Posicao* inicio - ponteiro para armazenar a posição de 'S'
  * @param Posicao* saida - ponteiro para armazenar a posição de 'E'
  * @return bool - true se ambas as posições foram encontradas
  */
-bool encontrar_posicoes_SE(char**, uint, uint, Posicao*, Posicao*);
+bool encontrar_posicoes_SE(char**, Labirinto*, Posicao*, Posicao*);
 
 /**
  * Calcula o fitness de um indivíduo no labirinto

@@ -26,29 +26,6 @@ char** alocar_matriz (uint n, uint m){
     return labirinto;
 }
 
-void liberar_matriz(char** matriz, uint n) {
-    for (uint i = 0; i < n; i++) {
-        free(matriz[i]);
-    }
-    free(matriz);
-}
-
-int labirinto_print(char** list, uint n, uint m, const Labirinto* lab){
-    for (uint i = 0; i < n; i++) {
-        for (uint j = 0; j < m; j++) {
-            printf("%c", list[i][j]);
-        }
-        printf("\n");
-    }
-    printf("=== LABIRINTO CARREGADO ===\n");
-    printf("\nDimensoes: %ux%u\n", n, m);
-    printf("Posicao inicial (S): (%u, %u)\n", lab->inicio.i, lab->inicio.j);
-    printf("Posicao destino (E): (%u, %u)\n", lab->saida.i, lab->saida.j);
-
-    return 0;
-}
-
-// Modificar a função para receber FILE*
 bool criar_matrizLab(char** labirinto, uint n, uint m, FILE* f) {
     if (!f) return false;
 
@@ -69,11 +46,18 @@ bool criar_matrizLab(char** labirinto, uint n, uint m, FILE* f) {
     return true;
 }
 
-bool encontrar_posicoes_SE(char** labirinto, uint n, uint m, Posicao* inicio, Posicao* saida) {
+void liberar_matriz(char** matriz, uint n) {
+    for (uint i = 0; i < n; i++) {
+        free(matriz[i]);
+    }
+    free(matriz);
+}
+
+bool encontrar_posicoes_SE(char** labirinto, Labirinto* lab, Posicao* inicio, Posicao* saida) {
     bool encontrouS = false, encontrouE = false;
     
-    for(uint i = 0; i < n; i++) {
-        for(uint j = 0; j < m; j++) {
+    for(uint i = 0; i < lab->n; i++) {
+        for(uint j = 0; j < lab->m; j++) {
             if(labirinto[i][j] == 'S') {
                 inicio->i = i;
                 inicio->j = j;
@@ -100,12 +84,24 @@ Labirinto* criar_contexto(char** labirinto, uint n, uint m, int penalidade) {
     lab->m = m;
     lab->penalidade = penalidade;
     
-    if (!encontrar_posicoes_SE(labirinto, n, m, &lab->inicio, &lab->saida)) {
+    if (!encontrar_posicoes_SE(labirinto, lab, &lab->inicio, &lab->saida)) {
         free(lab);
         return NULL;
     }
-    
     return lab;
 }
 
+int labirinto_print(char** labirinto, const Labirinto* lab){
+    for (uint i = 0; i < lab->n; i++) {
+        for (uint j = 0; j < lab->m; j++) {
+            printf("%c", labirinto[i][j]);
+        }
+        printf("\n");
+    }
+    printf("=== LABIRINTO CARREGADO ===\n");
+    printf("\nDimensoes: %ux%u\n", lab->n, lab->m);
+    printf("Posicao inicial (S): (%u, %u)\n", lab->inicio.i, lab->inicio.j);
+    printf("Posicao destino (E): (%u, %u)\n", lab->saida.i, lab->saida.j);
 
+    return 0;
+}

@@ -83,14 +83,17 @@ bool list_delete_begin(TLinkedList* lista){
     return true;
 }
 
-TSList* TSList_create() {
+TSList* TSList_create(uint capacidade) {
     TSList *novo = malloc(sizeof(TSList));
+
+    novo->data = malloc (sizeof (TSList));
     if(novo) novo->qty = 0;
+    novo->capacidade=  capacidade;
     return novo;
 }
 
 bool TSList_insert(TSList* lista, char valor) {
-    if(lista == NULL || TSList_is_full(lista)) return false;
+    if(lista == NULL || lista->qty >= lista->capacidade) return false;
     lista->data[lista->qty++] = valor;
     return true;
 }
@@ -99,19 +102,13 @@ void TSList_print(TSList* lista){
     if(lista == NULL) return;
     
     printf("[");
-    for(int i = 0; i < lista->qty; i++) {
+    for(uint i = 0; i < lista->qty; i++) {
         printf("%c", lista->data[i]);
         if(i < lista->qty - 1) {
             printf(", ");
         }
     }
     printf("]\n");
-}
-
-unsigned int TSList_qty(TSList* lista){
-    if(lista!=NULL)
-        return lista->qty;
-    return 0;
 }
 
 bool TSList_is_empty(TSList* lista){
@@ -127,5 +124,8 @@ bool TSList_is_full(TSList* lista){
 }
 
 void TSList_free(TSList* lista) {
-    if(lista) free(lista);
+    if(lista) {
+        free(lista->data);
+        free(lista);
+    }
 }

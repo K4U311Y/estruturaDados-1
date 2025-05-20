@@ -7,9 +7,9 @@
 typedef unsigned int uint;
 
 typedef struct _listS {
-    unsigned int qty;
-    unsigned int capacidade;
-    char* data;
+    unsigned int qty; //quantos elementos foram inseridos
+    unsigned int capacidade; //max elementos
+    char* data; //vetor
 } TSList;
 
 typedef struct _individuo {
@@ -107,12 +107,12 @@ void print_populacao(TLinkedList*);
 
 /**
  * Simula o movimento de um indivíduo no labirinto e retorna sua posição final.
- * @param const Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
- * @param TSList* caminho - listda de movimentos do inivíduo
+ * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
+ * @param Individuo* indiv - Ponteiro para o indivíduo que tem os movimentos
  * @param int* colisoes - ponteiro que calcula a quantidade de colisões para fazer o calculo do fitness
  * @return Posicao - posição final após aplicar os movimentos
  */
-Posicao simular_movimentos(const Labirinto*, TSList*, int*);
+Posicao simular_movimentos(const Labirinto*, Individuo*, int*);
 
 /**
  * Simula e avalia toda a população.
@@ -140,8 +140,8 @@ bool encontrar_posicoes_SE(char**, Labirinto*, Posicao*, Posicao*);
 
 /**
  * Calcula o fitness de um indivíduo no labirinto
- * @param lab Ponteiro para o contexto do labirinto
- * @param indiv Ponteiro para o indivíduo a ser avaliado
+ * @param Labirinto* Ponteiro para o contexto do labirinto
+ * @param Individuo* Ponteiro para o indivíduo a ser avaliado
  */
 void calcular_fitness(const Labirinto*, Individuo*);
 
@@ -208,9 +208,10 @@ bool list_delete_n(TLinkedList*, unsigned int);
 /**
  * Cria uma nova lista estática vazia.
  * Por exemplo, cria uma lista com qty = 0 e data vazio.
+ * @param uint - tamanho máximo de elementos que podem ser armazenados 
  * @return TSList* ponteiro para a lista alocada ou NULL em caso de falha
  */
-TSList* TSList_create();
+TSList* TSList_create(uint);
 
 /**
  * Insere um caractere no final da lista estática.

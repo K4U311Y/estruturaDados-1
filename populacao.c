@@ -19,15 +19,14 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
     if(!populacao) return NULL;
 
     for(int i = 0; i < tamanho_populacao; i++) {
-        Individuo ind = {
-            .caminho = TSList_create(),
-            /*
-            Quando fazemos rand() % (dist + 1), os possíveis valores passam a ser: 0, 1, 2, ..., dist
-            o taminho pode ser o minimo = dist e o max de dist+dist
-            */
-            .tamanho_caminho = dist + (rand() % (dist + 1)), 
-            .fitness = 0
-        };
+        Individuo ind;
+        /*
+        Quando fazemos rand() % (dist + 1), os possíveis valores passam a ser: 0, 1, 2, ..., dist
+        o taminho pode ser o minimo = dist e o max de dist+dist
+        */
+        ind.tamanho_caminho = dist + (rand() % (dist + 1));
+        ind.caminho = TSList_create(ind.tamanho_caminho);
+        ind.fitness = 0;
 
         if(!ind.caminho) {
             liberar_populacao(populacao);
@@ -69,7 +68,7 @@ void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
     
     while(atual != NULL) {
         int colisoes = 0;
-        Posicao final = simular_movimentos(lab, atual->info.caminho, &colisoes);
+        Posicao final = simular_movimentos(lab, &atual->info, &colisoes);
         
         printf("Individuo %03d\n", contador++);
         printf("Posicao final: (%u, %u)\n", final.i, final.j);
@@ -126,16 +125,16 @@ void print_populacao(TLinkedList* populacao) {
     }
 }
 
-Posicao simular_movimentos(const Labirinto* lab, TSList* caminho, int* colisoes) {
-    if(!lab || !caminho) return lab->inicio;
+Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes) {
+    if(!lab || !indiv || !indiv->caminho) return lab->inicio;
     
     Posicao atual = lab->inicio;
     int colisao = 0;
 
-    for(uint i = 0; i < caminho->qty; i++) {
+    for(uint i = 0; i < indiv->tamanho_caminho; i++) {
         Posicao proxima = atual;
         
-        switch(caminho->data[i]) {
+        switch(indiv->caminho->data[i]) {
             case 'C': proxima.i--; break;
             case 'B': proxima.i++; break;
             case 'E': proxima.j--; break;
@@ -158,7 +157,7 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
         return;
     }
     int colisoes = 0;
-    Posicao atual = simular_movimentos(lab, indiv->caminho, &colisoes);
+    Posicao atual = simular_movimentos(lab, indiv, &colisoes);
     int distancia = calcular_distancia_manhattan(atual, lab->saida);
     int fitness = 1000 - distancia - (colisoes * lab->penalidade);
     /*

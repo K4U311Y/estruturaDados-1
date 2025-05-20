@@ -154,11 +154,12 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
     // Verificações de segurança
     if(!lab || !indiv || !indiv->caminho || !lab->labirinto) {
         if(indiv) indiv->fitness = 0;
+        printf("algo deu errado");
         return;
     }
     int colisoes = 0;
     Posicao atual = simular_movimentos(lab, indiv, &colisoes);
-    int distancia = calcular_distancia_manhattan(atual, lab->saida);
+    int distancia = calcular_distancia_manhattan(atual, lab->saida); //minimo de movimentos necessários para chegar no fim
     int fitness = 1000 - distancia - (colisoes * lab->penalidade);
     /*
     Essa linha usa um operador ternário para garantir que o valor de fitness nunca seja negativo.

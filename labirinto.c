@@ -10,12 +10,12 @@ acabei optando por essa opção pois o professor disse que o código teria que f
 tamanho
 */
 char** alocar_matriz (uint n, uint m){
-    char** labirinto = malloc (n * sizeof(char*));
+    char** labirinto = malloc (n * sizeof(char*)); //Aloca um vetor de ponteiros (char*), onde cada ponteiro representará uma linha da matriz.
     if (!labirinto) 
         return NULL;
     
-        for (uint i = 0; i < n; i++) {
-            labirinto[i] = malloc(m * sizeof(char));
+        for (uint i = 0; i < n; i++) { //Para cada linha i 
+            labirinto[i] = malloc(m * sizeof(char)); //aloca um vetor de m caracteres (char), que representa as colunas da matriz.
             if (!labirinto[i]) {
                 // desaloca tudo em caso de erro
                 for (uint j = 0; j < i; j++) free(labirinto[j]);
@@ -53,17 +53,17 @@ void liberar_matriz(char** matriz, uint n) {
     free(matriz);
 }
 
-bool encontrar_posicoes_SE(char** labirinto, Labirinto* lab, Posicao* inicio, Posicao* saida) {
+bool encontrar_posicoes_SE(Labirinto* lab, Posicao* inicio, Posicao* saida) {
     bool encontrouS = false, encontrouE = false;
     
     for(uint i = 0; i < lab->n; i++) {
         for(uint j = 0; j < lab->m; j++) {
-            if(labirinto[i][j] == 'S') {
+            if(lab->labirinto[i][j] == 'S') {
                 inicio->i = i;
                 inicio->j = j;
                 encontrouS = true;
             }
-            if(labirinto[i][j] == 'E') {
+            if(lab->labirinto[i][j] == 'E') {
                 saida->i = i;
                 saida->j = j;
                 encontrouE = true;
@@ -84,17 +84,18 @@ Labirinto* criar_contexto(char** labirinto, uint n, uint m, int penalidade) {
     lab->m = m;
     lab->penalidade = penalidade;
     
-    if (!encontrar_posicoes_SE(labirinto, lab, &lab->inicio, &lab->saida)) {
+    if (!encontrar_posicoes_SE(lab, &lab->inicio, &lab->saida)) {
         free(lab);
         return NULL;
     }
     return lab;
 }
 
-int labirinto_print(char** labirinto, const Labirinto* lab){
+int labirinto_print(const Labirinto* lab){ //const indica que o ponteiro lab aponta para dados que não devem ser modificados dentro da função.
+    //ou seja, a função é só para leitura
     for (uint i = 0; i < lab->n; i++) {
         for (uint j = 0; j < lab->m; j++) {
-            printf("%c", labirinto[i][j]);
+            printf("%c", lab->labirinto[i][j]);
         }
         printf("\n");
     }

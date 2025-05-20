@@ -42,7 +42,7 @@ int main() {
     }
 
     // 3. Exibição do labirinto
-    labirinto_print(labirinto, lab);
+    labirinto_print(lab);
 
     uint tamanho_populacao;
     printf("Quantos individuos deseja que tenha na primeira populacao?");

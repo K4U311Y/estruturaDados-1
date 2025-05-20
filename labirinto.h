@@ -59,10 +59,9 @@ void liberar_matriz(char**, uint);
 /**
  * @brief Exibe informações completas sobre o labirinto carregado
  * 
- * @param char** Matriz de caracteres representando o labirinto
  * @param Labirinto* Ponteiro para a estrutura Labirinto com metadados
  */
-int labirinto_print(char**, const Labirinto*);
+int labirinto_print(const Labirinto*);
 
 /**
  * Carrega um labirinto a partir de um arquivo já aberto para a matriz.
@@ -130,7 +129,6 @@ void simular_populacao(const Labirinto*, TLinkedList*);
 
 /**
  * Encontra as posições de 'S' (início) e 'E' (saída) no labirinto.
- * @param char** labirinto - matriz do labirinto
  * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
  * @param Posicao* inicio - ponteiro para armazenar a posição de 'S'
  * @param Posicao* saida - ponteiro para armazenar a posição de 'E'

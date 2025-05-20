@@ -85,10 +85,16 @@ bool list_delete_begin(TLinkedList* lista){
 
 TSList* TSList_create(uint capacidade) {
     TSList *novo = malloc(sizeof(TSList));
+    if(!novo) return NULL;
 
-    novo->data = malloc (sizeof (TSList));
-    if(novo) novo->qty = 0;
-    novo->capacidade=  capacidade;
+    novo->data = malloc(capacidade * sizeof(char)); 
+    if(!novo->data) {
+        free(novo);
+        return NULL;
+    }
+
+    novo->qty = 0;
+    novo->capacidade = capacidade;
     return novo;
 }
 

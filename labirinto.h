@@ -134,7 +134,7 @@ void simular_populacao(const Labirinto*, TLinkedList*);
  * @param Posicao* saida - ponteiro para armazenar a posição de 'E'
  * @return bool - true se ambas as posições foram encontradas
  */
-bool encontrar_posicoes_SE(char**, Labirinto*, Posicao*, Posicao*);
+bool encontrar_posicoes_SE(Labirinto*, Posicao*, Posicao*);
 
 /**
  * Calcula o fitness de um indivíduo no labirinto

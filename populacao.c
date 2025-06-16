@@ -1,4 +1,5 @@
-#include "labirinto.h"
+#include "populacao.h"
+#include "individuo.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>

@@ -1,5 +1,5 @@
-
-#include "labirinto.h"
+#include "lista.h"
+#include "individuo.h"
 #include <stdlib.h>
 #include <stdio.h>
 

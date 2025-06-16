@@ -17,6 +17,49 @@ char** copiar_matriz(char** original, uint n, uint m) {
     return copia;
 }
 
+Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes, char** lab_copia) {
+    if(!lab || !indiv || !indiv->caminho) return lab->inicio;
+    
+    Posicao atual = lab->inicio;
+    int colisao = 0;
+
+    // Se lab_copia foi fornecido, marcar posição inicial
+    if(lab_copia && lab_copia[atual.i][atual.j] != 'S') {
+        lab_copia[atual.i][atual.j] = '@';
+    }
+
+    for(uint i = 0; i < indiv->caminho->qty; i++) {
+        char mov = indiv->caminho->data[i];
+        Posicao proxima = atual;
+        
+        switch(mov) {
+            case 'C': proxima.i--; break;
+            case 'B': proxima.i++; break;
+            case 'E': proxima.j--; break;
+            case 'D': proxima.j++; break;
+            default: continue;
+        }
+        
+        // Verificar movimento válido
+        if(proxima.i < lab->n && proxima.j < lab->m && 
+           proxima.i >= 0 && proxima.j >= 0 && 
+           lab->labirinto[proxima.i][proxima.j] != '#') {
+            atual = proxima;
+            
+            // Se lab_copia foi fornecido, marcar posição
+            if(lab_copia && lab_copia[atual.i][atual.j] != 'S' && 
+               lab_copia[atual.i][atual.j] != 'E') {
+                lab_copia[atual.i][atual.j] = '@';
+            }
+        } else {
+            colisao++;
+        }
+    }
+    
+    if(colisoes) *colisoes = colisao;
+    return atual;
+}
+
 char movimento_aleatorio() {
     char movimentos[] = {'C', 'B', 'E', 'D'};
     return movimentos[rand() % 4];
@@ -58,32 +101,11 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
         return;
     }
     
-    // Simula movimentos sem cópia do labirinto
     int colisoes = 0;
-    Posicao atual = lab->inicio;
+    // Chamada única para simular movimentos
+    Posicao final = simular_movimentos(lab, indiv, &colisoes, NULL);
     
-    for(uint i = 0; i < indiv->caminho->qty-1; i++) {
-        char mov = indiv->caminho->data[i];
-        Posicao proxima = atual;
-        
-        switch(mov) {
-            case 'C': proxima.i--; break;
-            case 'B': proxima.i++; break;
-            case 'E': proxima.j--; break;
-            case 'D': proxima.j++; break;
-            default: continue;
-        }
-        
-        if(proxima.i < lab->n && proxima.j < lab->m && 
-           proxima.i >= 0 && proxima.j >= 0 && 
-           lab->labirinto[proxima.i][proxima.j] != '#') {
-            atual = proxima;
-        } else {
-            colisoes++;
-        }
-    }
-    
-    int distancia = calcular_distancia_manhattan(atual, lab->saida);
+    int distancia = calcular_distancia_manhattan(final, lab->saida);
     int fitness = 1000 - distancia - (colisoes * lab->penalidade);
     indiv->fitness = (fitness > 0) ? fitness : 0;
 }
@@ -204,49 +226,5 @@ void print_populacao(TLinkedList* populacao) {
         
         atual = atual->prox;
     }
-}
-
-Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes, char** lab_copia) {
-    if(!lab || !indiv || !indiv->caminho) return lab->inicio;
-    
-    Posicao atual = lab->inicio;
-    int colisao = 0;
-
-    // Marca posição inicial (se não for S)
-    if(lab_copia[atual.i][atual.j] != 'S') {
-        lab_copia[atual.i][atual.j] = '@';
-    }
-
-    // Percorre movimentos na ordem de inserção
-    for(uint i = 0; i < indiv->caminho->qty-1; i++) {
-        char mov = indiv->caminho->data[i];
-        Posicao proxima = atual;
-        
-        switch(mov) {
-            case 'C': proxima.i--; break;
-            case 'B': proxima.i++; break;
-            case 'E': proxima.j--; break;
-            case 'D': proxima.j++; break;
-            default: continue;
-        }
-        
-        // Verifica movimento válido
-        if(proxima.i < lab->n && proxima.j < lab->m && 
-           proxima.i >= 0 && proxima.j >= 0 && 
-           lab->labirinto[proxima.i][proxima.j] != '#') {
-            atual = proxima;
-            
-            // Marca posição (exceto S e E)
-            if(lab_copia[atual.i][atual.j] != 'S' && 
-               lab_copia[atual.i][atual.j] != 'E') {
-                lab_copia[atual.i][atual.j] = '@';
-            }
-        } else {
-            colisao++;
-        }
-    }
-    
-    if(colisoes) *colisoes = colisao;
-    return atual;
 }
 

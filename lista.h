@@ -14,11 +14,11 @@ typedef struct _stack{
     //topo = elemento no indice qty-1
 } Stack;
 
-typedef struct _individuo {
+struct _individuo {
     Stack* caminho;      // Lista de movimentos ('C', 'B', 'E', 'D')
     int fitness;          // Valor que indica a qualidade da solução
     int tamanho_caminho;  // Número de movimentos no caminho
-} Individuo;
+};
 
 typedef struct _no {
     Individuo info;
@@ -87,10 +87,10 @@ Stack* Stack_create();
 /**
  * Tenta inserir um dado na pilha.
  * @param Stack* ponteiro para a pilha
- * @param int valor inteiro para ser inserido na pilha
+ * @param char valor para ser inserido na pilha
  * @return bool informando o status da operação.
  */
-bool Stack_push(Stack*, int);
+bool Stack_push(Stack*, char);
 /**
  * Tenta remover o elemento do topo da pilha.
  * @param Stack* ponteiro para a pilha
@@ -98,7 +98,7 @@ bool Stack_push(Stack*, int);
  * o valor removido da pilha.
  * @return bool informando o status da operação.
  */
-bool Stack_pop(Stack*, int*);
+bool Stack_pop(Stack*, char*);
 /**
  * Retorna se a pilha está cheia.
  * @param Stack*

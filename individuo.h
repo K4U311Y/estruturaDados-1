@@ -1,10 +1,12 @@
 #ifndef INDIVIDUO_H
 #define INDIVIDUO_H
-#include "lista.h"
 #include "labirinto.h"
-#include<stdbool.h>
+
 #include <stdint.h>
 #include <stdio.h>
+
+typedef struct _labirinto Labirinto;
+typedef struct _individuo Individuo;
 
 /**
  * Gera um movimento aleatório para o caminho.
@@ -26,7 +28,7 @@ char movimento_valido_aleatorio(Labirinto* lab, Posicao atual);
  * @param int* colisoes - ponteiro que calcula a quantidade de colisões para fazer o calculo do fitness
  * @return Posicao - posição final após aplicar os movimentos
  */
-Posicao simular_movimentos(const Labirinto*, Individuo*, int*);
+Posicao simular_movimentos(const Labirinto*, Individuo*, int*, char**);
 
 /**
  * Calcula o fitness de um indivíduo no labirinto

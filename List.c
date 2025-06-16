@@ -1,4 +1,5 @@
 #include "individuo.h"
+#include "lista.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -82,46 +83,56 @@ bool list_delete_begin(TLinkedList* lista){
     return true;
 }
 
-Stack* Stack_create(){
+// Implementação correta da pilha
+Stack* Stack_create(unsigned int capacidade) {
     Stack* nova = malloc(sizeof(Stack));
-    if(nova!=NULL)
-        nova->qty = 0;
+    if(!nova) return NULL;
+    
+    nova->data = malloc(capacidade * sizeof(char));
+    if(!nova->data) {
+        free(nova);
+        return NULL;
+    }
+    
+    nova->qty = 0;
+    nova->capacidade = capacidade;
     return nova;
 }
 
-bool Stack_push(Stack* pilha, int info){
-    if(Stack_is_full(pilha))
-        return false;
-    //Codigo para se a pilha nao estiver cheia
-    pilha->data[pilha->qty++] = info;
-    return true;
-}
-bool Stack_pop(Stack* pilha, int* info){
-    if(Stack_is_empty(pilha))
-        return false;
-    *info = pilha->data[--(pilha->qty)];
+bool Stack_push(Stack* pilha, char valor) {
+    if(!pilha || pilha->qty >= pilha->capacidade) return false;
+    pilha->data[pilha->qty++] = valor;
     return true;
 }
 
-bool Stack_is_empty(Stack* pilha){
-    return pilha->qty == 0;
+bool Stack_pop(Stack* pilha, char* info) {
+    if(!pilha || Stack_is_empty(pilha)) return false;
+    *info = pilha->data[--pilha->qty];
+    return true;
 }
 
-bool Stack_is_full(Stack* pilha){
-    return pilha->qty == pilha->capacidade;
+bool Stack_is_empty(Stack* pilha) {
+    return pilha ? pilha->qty == 0 : true;
 }
 
-unsigned int Stack_size(Stack* pilha){
-    return pilha->qty;
+bool Stack_is_full(Stack* pilha) {
+    return pilha ? pilha->qty == pilha->capacidade : false;
+}
+
+unsigned int Stack_size(Stack* pilha) {
+    return pilha ? pilha->qty : 0;
 }
 
 void Stack_print(Stack* pilha) {
-    if(!pilha) return;
+    if(!pilha || pilha->qty == 0) {
+        printf("[]");
+        return;
+    }
     
     printf("[");
-    for(int i = pilha->qty-1 - 1; i >= 0; i--) {
+    for(int i = 0; i < pilha->qty; i++) {
         printf("%c", pilha->data[i]);
-        if(i > 0) printf(", ");
+        if(i < pilha->qty - 1) printf(", ");
     }
     printf("]");
 }

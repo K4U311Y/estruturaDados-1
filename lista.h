@@ -7,11 +7,18 @@
 
 typedef unsigned int uint;
 
-typedef struct _listS {
-    unsigned int qty; //quantos elementos foram inseridos
-    unsigned int capacidade; //max elementos
-    char* data; //vetor
-} TSList;
+typedef struct _stack{
+    char* data;
+    unsigned int capacidade;
+    unsigned int qty;//Quantidade de elementos na pilha
+    //topo = elemento no indice qty-1
+} Stack;
+
+typedef struct _individuo {
+    Stack* caminho;      // Lista de movimentos ('C', 'B', 'E', 'D')
+    int fitness;          // Valor que indica a qualidade da solução
+    int tamanho_caminho;  // Número de movimentos no caminho
+} Individuo;
 
 typedef struct _no {
     Individuo info;
@@ -72,58 +79,50 @@ bool list_delete_begin(TLinkedList*);
 bool list_delete_n(TLinkedList*, unsigned int);
 
 /**
- * Cria uma nova lista estática vazia.
- * Por exemplo, cria uma lista com qty = 0 e data vazio.
- * @param uint - tamanho máximo de elementos que podem ser armazenados 
- * @return TSList* ponteiro para a lista alocada ou NULL em caso de falha
+ * Cria instâncias de pilhas. 
+ * Retorna NULL caso não seja possível alocar memória para uma nova pilha.
+ * @return Stack* ponteiro para uma pilha possivelmente alocada. 
  */
-TSList* TSList_create(uint);
+Stack* Stack_create();
+/**
+ * Tenta inserir um dado na pilha.
+ * @param Stack* ponteiro para a pilha
+ * @param int valor inteiro para ser inserido na pilha
+ * @return bool informando o status da operação.
+ */
+bool Stack_push(Stack*, int);
+/**
+ * Tenta remover o elemento do topo da pilha.
+ * @param Stack* ponteiro para a pilha
+ * @param int* ponteiro para um inteiro para armazenar 
+ * o valor removido da pilha.
+ * @return bool informando o status da operação.
+ */
+bool Stack_pop(Stack*, int*);
+/**
+ * Retorna se a pilha está cheia.
+ * @param Stack*
+ * @return bool informando se está cheia.
+ */
+bool Stack_is_full(Stack*);
+/**
+ * Retorna se a pilha está vazia.
+ * @param Stack*
+ * @return bool informando se está vazia.
+ */
+bool Stack_is_empty(Stack*);
+/**
+ * Retorna a quantidade de elementos da pilha.
+ * @param Stack*
+ * @return unsigned int número de elementos da pilha.
+ */
+unsigned int Stack_size(Stack*);
 
 /**
- * Insere um caractere no final da lista estática.
- * Por exemplo, inserir 'A', 'B' resulta em data = ['A', 'B'].
- * @param TSList* ponteiro para a lista
- * @param char valor a ser inserido
- * @return bool true se a inserção foi bem-sucedida
+ * Da print na pilha
+ * @param Stack* pilha a ser printada
  */
-bool TSList_insert(TSList*, char);
 
-/**
- * Imprime os elementos da lista estática no console.
- * Por exemplo, imprime "A, B" para a lista acima.
- * @param TSList* ponteiro para a lista
- */
-void TSList_print(TSList*);
-
-/**
- * Obtém a quantidade de elementos na lista estática.
- * Por exemplo, retorna 2 para a lista ['A', 'B'].
- * @param TSList* ponteiro para a lista
- * @return unsigned int número de elementos
- */
-unsigned int TSList_qty(TSList*);
-
-/**
- * Verifica se a lista estática está vazia.
- * Por exemplo, retorna true para uma lista recém-criada.
- * @param TSList* ponteiro para a lista
- * @return bool true se a lista está vazia
- */
-bool TSList_is_empty(TSList*);
-
-/**
- * Verifica se a lista estática está cheia.
- * Por exemplo, retorna true se qty == MAX (100).
- * @param TSList* ponteiro para a lista
- * @return bool true se a lista está cheia
- */
-bool TSList_is_full(TSList*);
-
-/**
- * Libera a memória alocada para a lista estática.
- * Por exemplo, libera a memória de uma lista com 2 elementos.
- * @param TSList* ponteiro para a lista
- */
-void TSList_free(TSList*);
+void Stack_print(Stack*);
 
 #endif

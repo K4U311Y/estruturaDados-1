@@ -1,10 +1,12 @@
+// main.c
 #include "individuo.h"
+#include "populacao.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 int main() {
-    srand(time(NULL)); // Para movimento_aleatorio() funcionar corretamente
+    srand(time(NULL));
 
     // 1. Carregamento do labirinto
     FILE* file = fopen("labirinto.txt", "r");
@@ -23,14 +25,13 @@ int main() {
 
     // Alocação e leitura da matriz
     char** labirinto = alocar_matriz(n, m);
-
-
     if (!criar_matrizLab(labirinto, n, m, file)) {
-    fprintf(stderr, "Erro ao carregar labirinto do arquivo\n");
-    liberar_matriz(labirinto, n);
-    fclose(file);
-    return 1;
+        fprintf(stderr, "Erro ao carregar labirinto do arquivo\n");
+        liberar_matriz(labirinto, n);
+        fclose(file);
+        return 1;
     }
+    fclose(file);
 
     // 2. Criação do contexto do labirinto
     int penalidade = 20;
@@ -45,8 +46,8 @@ int main() {
     labirinto_print(lab);
 
     uint tamanho_populacao;
-    printf("Quantos individuos deseja que tenha na primeira populacao?");
-    scanf ("%d", &tamanho_populacao);
+    printf("Quantos individuos deseja que tenha na primeira populacao? ");
+    scanf("%u", &tamanho_populacao);
     getchar();
 
     // 4. Criação da população
@@ -57,7 +58,8 @@ int main() {
         return 1;
     }
 
-    // 5. printar a população
+    // 5. Exibição da população
+    printf("\n=== Populacao Inicial ===\n");
     print_populacao(populacao);
 
     // 6. Simulação e exibição dos resultados
@@ -66,6 +68,7 @@ int main() {
     // 7. Liberação de recursos
     liberar_populacao(populacao);
     liberar_matriz(labirinto, n);
+    free(lab);
 
     return 0;
 }

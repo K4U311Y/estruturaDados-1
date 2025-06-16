@@ -1,4 +1,3 @@
-#include "lista.h"
 #include "individuo.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -83,55 +82,46 @@ bool list_delete_begin(TLinkedList* lista){
     return true;
 }
 
-TSList* TSList_create(uint capacidade) {
-    TSList *novo = malloc(sizeof(TSList));
-    if(!novo) return NULL;
-
-    novo->data = malloc(capacidade * sizeof(char)); 
-    if(!novo->data) {
-        free(novo);
-        return NULL;
-    }
-
-    novo->qty = 0;
-    novo->capacidade = capacidade;
-    return novo;
+Stack* Stack_create(){
+    Stack* nova = malloc(sizeof(Stack));
+    if(nova!=NULL)
+        nova->qty = 0;
+    return nova;
 }
 
-bool TSList_insert(TSList* lista, char valor) {
-    if(lista == NULL || lista->qty >= lista->capacidade) return false;
-    lista->data[lista->qty++] = valor;
+bool Stack_push(Stack* pilha, int info){
+    if(Stack_is_full(pilha))
+        return false;
+    //Codigo para se a pilha nao estiver cheia
+    pilha->data[pilha->qty++] = info;
+    return true;
+}
+bool Stack_pop(Stack* pilha, int* info){
+    if(Stack_is_empty(pilha))
+        return false;
+    *info = pilha->data[--(pilha->qty)];
     return true;
 }
 
-void TSList_print(TSList* lista){
-    if(lista == NULL) return;
+bool Stack_is_empty(Stack* pilha){
+    return pilha->qty == 0;
+}
+
+bool Stack_is_full(Stack* pilha){
+    return pilha->qty == pilha->capacidade;
+}
+
+unsigned int Stack_size(Stack* pilha){
+    return pilha->qty;
+}
+
+void Stack_print(Stack* pilha) {
+    if(!pilha) return;
     
     printf("[");
-    for(uint i = 0; i < lista->qty; i++) {
-        printf("%c", lista->data[i]);
-        if(i < lista->qty - 1) {
-            printf(", ");
-        }
+    for(int i = pilha->qty-1 - 1; i >= 0; i--) {
+        printf("%c", pilha->data[i]);
+        if(i > 0) printf(", ");
     }
-    printf("]\n");
-}
-
-bool TSList_is_empty(TSList* lista){
-    if(lista!=NULL)
-        return lista->qty == 0;
-    return true;
-}
-
-bool TSList_is_full(TSList* lista){
-    if(lista!=NULL)
-        return lista->qty == 100;
-    return false;
-}
-
-void TSList_free(TSList* lista) {
-    if(lista) {
-        free(lista->data);
-        free(lista);
-    }
+    printf("]");
 }

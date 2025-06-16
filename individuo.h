@@ -6,18 +6,18 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct _individuo {
-    TSList* caminho;      // Lista de movimentos ('C', 'B', 'E', 'D')
-    int fitness;          // Valor que indica a qualidade da solução
-    int tamanho_caminho;  // Número de movimentos no caminho
-} Individuo;
-
 /**
- * Gera um movimento aleatório válido para o caminho.
+ * Gera um movimento aleatório para o caminho.
  * Por exemplo, pode retornar 'C' (Cima), 'B' (Baixo), etc.
  * @return char movimento aleatório ('C', 'B', 'E' ou 'D')
  */
 char movimento_aleatorio();
+/**
+ * Gera movimento válido 
+ * Exemplo: EX: no start tem parede em cima e na esquerda, as opções de movimento são só baixo e direita
+ * @return char movimento aleatório 
+ */
+char movimento_valido_aleatorio(Labirinto* lab, Posicao atual);
 
 /**
  * Simula o movimento de um indivíduo no labirinto e retorna sua posição final.

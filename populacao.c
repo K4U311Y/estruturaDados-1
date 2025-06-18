@@ -16,7 +16,8 @@ char** copiar_matriz(char** original, uint n, uint m) {
     }
     return copia;
 }
-
+//separar aqui a geração de movimento aleatório e a de movimentos válidos, o de movimento aleatório, so o primeiro movimente será somente para a direira ou para baixo
+//que é o caso desse labirinto, a o movimentos válidos não terá penalidade por colisão pois ele considera o movimento que vai bater na parede
 Posicao simular_movimentos(const Labirinto* lab, Individuo* indiv, int* colisoes, char** lab_copia) {
     if(!lab || !indiv || !indiv->caminho) return lab->inicio;
     
@@ -100,16 +101,19 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
         if(indiv) indiv->fitness = 0;
         return;
     }
+
+    int w_distancia = 1000;
     
     int colisoes = 0;
     // Chamada única para simular movimentos
     Posicao final = simular_movimentos(lab, indiv, &colisoes, NULL);
     
     int distancia = calcular_distancia_manhattan(final, lab->saida);
-    int fitness = 1000 - distancia - (colisoes * lab->penalidade);
+    int fitness = w_distancia - distancia - (colisoes * lab->penalidade);
     indiv->fitness = (fitness > 0) ? fitness : 0;
 }
 
+// populacao.c (função modificada)
 TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
     if(!lab) return NULL;
     int dist = calcular_distancia_manhattan(lab->inicio, lab->saida);
@@ -127,20 +131,14 @@ TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
             return NULL;
         }
 
-        for(int j = 0; j < ind.tamanho_caminho; j++) {
-            char mov;
-            if(j == 0) {
-                // Garante primeiro movimento válido
-                mov = movimento_valido_aleatorio(lab, lab->inicio);
-            } else {
-                mov = movimento_aleatorio();
-            }
-            
-            if(!Stack_push(ind.caminho, mov)) {
-                free(ind.caminho);
-                free(populacao);
-                return NULL;
-            }
+        // Gera primeiro movimento válido
+        char mov_inicial = movimento_valido_aleatorio(lab, lab->inicio);
+        Stack_push(ind.caminho, mov_inicial);
+        
+        // Gera movimentos subsequentes (podem ser aleatórios, inclusive inválidos)
+        for(int j = 1; j < ind.tamanho_caminho; j++) {
+            char mov = movimento_aleatorio();
+            Stack_push(ind.caminho, mov);
         }
 
         calcular_fitness(lab, &ind);

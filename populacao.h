@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "lista.h"
+#include "config.h"
 
 /**
  * Cria uma população inicial de indivíduos com caminhos aleatórios.
@@ -13,7 +14,7 @@
  * @return TLinkedList* - lista encadeada contendo a população ou NULL em caso de erro
  * @see calcular_distancia_manhattan(), TSList_create(), list_create()
  */
-TLinkedList* criar_populacao(Labirinto*, uint);
+TLinkedList* criar_populacao(Labirinto*, uint, FormaCaminho);
 
 /**
  * Libera toda a memória alocada para uma população.

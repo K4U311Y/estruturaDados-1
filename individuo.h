@@ -36,6 +36,7 @@ Posicao simular_movimentos(const Labirinto*, Individuo*, int*, char**);
  * @param Individuo* Ponteiro para o indivíduo a ser avaliado
  */
 void calcular_fitness(const Labirinto*, Individuo*);
-
+/////////////////////////////////////////////
+void liberar_individuo(Individuo* indiv);
 
 #endif

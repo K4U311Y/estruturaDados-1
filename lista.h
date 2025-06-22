@@ -18,6 +18,7 @@ struct _individuo {
     Stack* caminho;      // Lista de movimentos ('C', 'B', 'E', 'D')
     int fitness;          // Valor que indica a qualidade da solução
     int tamanho_caminho;  // Número de movimentos no caminho
+    int id;
 };
 
 typedef struct _no {
@@ -124,5 +125,11 @@ unsigned int Stack_size(Stack*);
  */
 
 void Stack_print(Stack*);
+
+/////////////////////////////////////////////////////////
+unsigned int list_size(TLinkedList* lista);
+
+//////////////////////////////////////////////////////////
+Stack* Stack_copy(const Stack* original);
 
 #endif

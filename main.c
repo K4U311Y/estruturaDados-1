@@ -1,4 +1,3 @@
-// main.c
 #include "individuo.h"
 #include "config.h"
 #include "populacao.h"
@@ -15,7 +14,7 @@ int main() {
         fprintf(stderr, "Erro: Nao foi possivel abrir o arquivo do labirinto\n");
         return 1;
     }
-    
+     
     // Leitura das dimensões
     uint n, m;
     if (fscanf(file, "%u %u\n", &n, &m) != 2) {
@@ -37,7 +36,8 @@ int main() {
      Config config = ler_config("config.yaml");
 
     // 2. Criação do contexto do labirinto
-    int penalidade = 20;
+    ///////////////////////////////////////////////////////////////////
+    //int penalidade = 20;
     Labirinto* lab = criar_contexto(labirinto, n, m, config.penalidade);
     if (!lab) {
         fprintf(stderr, "Erro: Falha ao criar contexto do labirinto\n");
@@ -47,11 +47,11 @@ int main() {
 
     // 3. Exibição do labirinto
     labirinto_print(lab);
-
-    uint tamanho_populacao;
-    printf("Quantos individuos deseja que tenha na primeira populacao? ");
-    scanf("%u", &tamanho_populacao);
-    getchar();
+//////////////////////////////////////////////////////////////////
+    //uint tamanho_populacao;
+    //printf("Quantos individuos deseja que tenha na primeira populacao? ");
+    //scanf("%u", &tamanho_populacao);
+    //getchar();
 
     // 4. Criação da população
     TLinkedList* populacao = criar_populacao(lab, config.tamanho_populacao, config.forma_caminho); //arrumar o .h
@@ -61,14 +61,38 @@ int main() {
         return 1;
     }
 
-    // 5. Exibição da população
+    // 5. Avaliação inicial da população
+    simular_populacao(lab, populacao);
+
+    ////////////////////////////////////////////////////////////
+     // 6. Loop do algoritmo genético
+    int geracao = 0;
+    while (geracao < config.max_gen) {
+        printf("\n=== Geracao %d/%d ===\n", geracao + 1, config.max_gen);
+        
+        // Seleção e reprodução
+        TLinkedList* nova_geracao = criar_nova_geracao(populacao, lab, config);
+        //int fitness_total = calcular_fitness_total(populacao);
+
+        liberar_populacao(populacao);
+        populacao = nova_geracao;
+
+        // Avaliação a cada 10 gerações ou na última
+        if (geracao % 10 == 0 || geracao == config.max_gen - 1) {
+            simular_populacao(lab, populacao);
+        }
+        geracao++;
+    }
+
+    // .7 Exibição da população
     printf("\n=== Populacao Inicial ===\n");
     print_populacao(populacao);
 
-    // 6. Simulação e exibição dos resultados
+    // 7. Resultado final (SIMPLIFICADO)
+    printf("\n=== RESULTADO FINAL ===\n");
     simular_populacao(lab, populacao);
-
-    // 7. Liberação de recursos
+    
+    // 8. Liberação de recursos
     liberar_populacao(populacao);
     liberar_matriz(labirinto, n);
     free(lab);

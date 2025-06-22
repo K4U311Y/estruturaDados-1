@@ -20,7 +20,9 @@ bool list_insert_begin(TLinkedList* lista, Individuo info){
     return true;
 }
 
+/////////////////modificada///////////////////////////////////////////////////
 bool list_insert_end(TLinkedList* lista, Individuo info) {
+    printf("DEBUG: list_insert_end: Inserindo ID %d. list->inicio antes: %p\n", info.id, (void*)lista->inicio);
     TNo* novo = malloc(sizeof(TNo));
     if(!novo) return false;
     
@@ -135,4 +137,34 @@ void Stack_print(Stack* pilha) {
         if(i < pilha->qty - 1) printf(", ");
     }
     printf("]");
+}
+
+///////////////////////////////////////////
+unsigned int list_size(TLinkedList* lista) {
+    if (!lista) return 0;
+    
+    unsigned int count = 0;
+    TNo* atual = lista->inicio;
+    while (atual != NULL) {
+        count++;
+        atual = atual->prox;
+    }
+    return count;
+}
+
+/////////////////////////////////////////////////
+Stack* Stack_copy(const Stack* original) {
+    if (!original) return NULL;
+
+    // Cria uma nova pilha com a mesma capacidade da original
+    Stack* nova_pilha = Stack_create(original->capacidade);
+    if (!nova_pilha) return NULL; // Falha na alocação da nova pilha
+
+    // Copia os dados (chars) da pilha original para a nova pilha
+    if (original->qty > 0) {
+        memcpy(nova_pilha->data, original->data, original->qty * sizeof(char));
+    }
+    nova_pilha->qty = original->qty; // A nova pilha tem a mesma quantidade de elementos
+
+    return nova_pilha;
 }

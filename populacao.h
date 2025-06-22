@@ -44,5 +44,26 @@ void print_populacao(TLinkedList*);
  */
 void simular_populacao(const Labirinto*, TLinkedList*);
 
+////////////////////////////////////////////////////////////////////
+int calcular_fitness_total(TLinkedList* populacao);
+
+////////////////////////////////////////////////////////////////////
+/**
+ * @brief Seleciona um indivíduo da população usando o método da roleta.
+ *
+ * @param populacao A lista encadeada da população.
+ * @param fitness_total A soma total dos fitness de todos os indivíduos na população.
+ * @return Um ponteiro para o indivíduo selecionado na população.
+ * Retorna NULL se a população for vazia ou o fitness_total for <= 0.
+ */
+Individuo* selecionar_pai_roleta(TLinkedList* populacao, int fitness_total);
+
+Individuo crossover(Individuo pai1, Individuo pai2);
+void mutar(Individuo* indiv, Labirinto* lab);
+void preservar_elites(TLinkedList* populacao_antiga, TLinkedList* nova_geracao, int num_elites);
+TLinkedList* criar_nova_geracao(TLinkedList* populacao_antiga, Labirinto* lab, Config config);
+int calcular_fitness_total(TLinkedList* populacao);
+
+Individuo copiar_individuo(const Individuo* original); 
 
 #endif

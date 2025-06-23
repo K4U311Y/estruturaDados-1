@@ -1,6 +1,7 @@
 #ifndef INDIVIDUO_H
 #define INDIVIDUO_H
 #include "labirinto.h"
+#include "config.h" // pra ter acesso a FormaCaminho e Config
 
 #include <stdint.h>
 #include <stdio.h>
@@ -34,8 +35,10 @@ Posicao simular_movimentos(const Labirinto*, Individuo*, int*, char**);
  * Calcula o fitness de um indivíduo no labirinto
  * @param Labirinto* Ponteiro para o contexto do labirinto
  * @param Individuo* Ponteiro para o indivíduo a ser avaliado
+ * @param FormaCaminho forma_geracao - indica a forma como o individuo foi gerado (importante pq muda a penalidade)
+ * @param int w_distancia - o peso da distancia, lido do arquivo configuração
  */
-void calcular_fitness(const Labirinto*, Individuo*);
+void calcular_fitness(const Labirinto*, Individuo*, FormaCaminho, int);
 
 
 #endif

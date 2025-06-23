@@ -10,11 +10,11 @@
  * Cria uma população inicial de indivíduos com caminhos aleatórios.
  * Por exemplo, gera uma população com tamanho baseado na distância de Manhattan.
  * @param Labirinto* - ponteiro para o contexto do labirinto contendo S, E e dimensões
- * @param uint - tamanho da população dado pelo usuário
+ * @param const Config* - ponteiro para a configuração
  * @return TLinkedList* - lista encadeada contendo a população ou NULL em caso de erro
  * @see calcular_distancia_manhattan(), TSList_create(), list_create()
  */
-TLinkedList* criar_populacao(Labirinto*, uint, FormaCaminho);
+TLinkedList* criar_populacao(Labirinto*, const Config*);
 
 /**
  * Libera toda a memória alocada para uma população.
@@ -42,7 +42,7 @@ void print_populacao(TLinkedList*);
  *- penalidade: valor da penalidade por colisão
  * @param TLinkedList Lista encadeada contendo a população a ser avaliada
  */
-void simular_populacao(const Labirinto*, TLinkedList*);
+void simular_populacao(const Labirinto*, TLinkedList*, const Config*);
 
 
 #endif

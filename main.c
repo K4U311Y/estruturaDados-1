@@ -34,7 +34,7 @@ int main() {
     }
     fclose(file);
 
-     Config config = ler_config("config.yaml");
+    Config config = ler_config("config.yaml");
 
     // 2. Criação do contexto do labirinto
     int penalidade = 20;
@@ -48,16 +48,20 @@ int main() {
     // 3. Exibição do labirinto
     labirinto_print(lab);
 
-    uint tamanho_populacao;
-    printf("Quantos individuos deseja que tenha na primeira populacao? ");
-    scanf("%u", &tamanho_populacao);
-    getchar();
+    ///////////////////////////////////////////////////////////////////
+    //uint tamanho_populacao;
+    //printf("Quantos individuos deseja que tenha na primeira populacao? ");
+    //scanf("%u", &tamanho_populacao);
+    //getchar();
 
+    ///////////////////////////////////////////////////////////////////
     // 4. Criação da população
-    TLinkedList* populacao = criar_populacao(lab, config.tamanho_populacao, config.forma_caminho); //arrumar o .h
+    // Agora passa o endereço da estrutura Config completa
+    TLinkedList* populacao = criar_populacao(lab, &config); 
     if (!populacao) {
         fprintf(stderr, "Erro: Falha ao criar populacao\n");
         liberar_matriz(labirinto, n);
+        free(lab);
         return 1;
     }
 
@@ -65,8 +69,10 @@ int main() {
     printf("\n=== Populacao Inicial ===\n");
     print_populacao(populacao);
 
+    //////////////////////////////////////////////////////////////////////////
     // 6. Simulação e exibição dos resultados
-    simular_populacao(lab, populacao);
+    //também passa o endereço completo de config
+    simular_populacao(lab,populacao, &config);
 
     // 7. Liberação de recursos
     liberar_populacao(populacao);

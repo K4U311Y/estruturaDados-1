@@ -96,72 +96,130 @@ int calcular_distancia_manhattan(Posicao a, Posicao b) {
     return abs((int)a.i - (int)b.i) + abs((int)a.j - (int)b.j);
 }
 
-void calcular_fitness(const Labirinto* lab, Individuo* indiv) {
+//////////////////////////////////////
+void calcular_fitness(const Labirinto* lab, Individuo* indiv, FormaCaminho forma_geracao, int w_distancia) {
     if(!lab || !indiv || !indiv->caminho) {
         if(indiv) indiv->fitness = 0;
         return;
     }
-
-    int w_distancia = 1000;
+    /////////////////AQUI//////////////////
+    //int w_distancia = 1000;
     
     int colisoes = 0;
     // Chamada única para simular movimentos
     Posicao final = simular_movimentos(lab, indiv, &colisoes, NULL);
     
     int distancia = calcular_distancia_manhattan(final, lab->saida);
-    int fitness = w_distancia - distancia - (colisoes * lab->penalidade);
-    indiv->fitness = (fitness > 0) ? fitness : 0;
+    int fitness = 0;
+
+    ////////////calculando fitness com base na forma de geração
+    if(forma_geracao == MOV_VALIDOS){
+        fitness = w_distancia - distancia; // Usando w_distancia do labirinto (que vem do config)
+    } else { // no caso o ALEATORIO
+        fitness = w_distancia -  distancia - (colisoes * lab->penalidade);
+    }
+    indiv->fitness = (fitness > 0) ? fitness : 0; //pq fitness não  pode ser negativo
 }
 
 // populacao.c (função modificada)
-TLinkedList* criar_populacao(Labirinto* lab, uint tamanho_populacao) {
-    if(!lab) return NULL;
+TLinkedList* criar_populacao(Labirinto* lab, const Config* config) {////////////////////////////
+    if(!lab || !config) return NULL;
     int dist = calcular_distancia_manhattan(lab->inicio, lab->saida);
     TLinkedList* populacao = list_create();
     if(!populacao) return NULL;
 
-    for(int i = 0; i < tamanho_populacao; i++) {
+    for(int i = 0; i < config->tamanho_populacao; i++) {
         Individuo ind;
         ind.tamanho_caminho = dist + (rand() % (dist + 1));
         ind.caminho = Stack_create(ind.tamanho_caminho);
         ind.fitness = 0;
 
         if(!ind.caminho) {
+            TNo* current = populacao->inicio;
+            while (current != NULL) {
+                //////////////////////////////////////////////////////
+                TNo* next = current->prox;
+                free(current->info.caminho->data); // Liberar o array de dados da pilha
+                free(current->info.caminho);       // Liberar a estrutura da pilha
+                free(current);                     // Liberar o nó da lista
+                current = next;
+            }
             free(populacao);
             return NULL;
         }
-
-        // Gera primeiro movimento válido
-        char mov_inicial = movimento_valido_aleatorio(lab, lab->inicio);
-        Stack_push(ind.caminho, mov_inicial);
+        ////////////////////////////////////////////////////
+        Posicao current_pos = lab->inicio; // Posição para rastrear durante a geração do caminho
         
-        // Gera movimentos subsequentes (podem ser aleatórios, inclusive inválidos)
-        for(int j = 1; j < ind.tamanho_caminho; j++) {
-            char mov = movimento_aleatorio();
-            Stack_push(ind.caminho, mov);
+        //////////////////////////GERAÇÃO DE CAMINHO COM BASE EM 'forma_caminho'
+        if (config->forma_caminho == ALEATORIO){
+            for(int j = 0; j < ind.tamanho_caminho; j++){
+                char mov =  movimento_aleatorio();
+                Stack_push(ind.caminho, mov);
+            }
+        } else if (config->forma_caminho == MOV_VALIDOS){
+            for(int j = 0; j < ind.tamanho_caminho; j++){
+                char mov = movimento_valido_aleatorio(lab, current_pos);
+                Stack_push(ind.caminho, mov);
+
+                ///////////////////////////////////////////////////////////////
+                //este bloco garante que quando está gerando um indivíduo do tipo MOV_VALIDOS,
+                //todos os movimentos são gerados com movimento_valido_aleatorio() (e a current_pos é atualizada).
+                //é meio que salvar a posição que parou
+                Posicao next_pos = current_pos;
+                switch(mov) {
+                    case 'C': next_pos.i--; break;
+                    case 'B': next_pos.i++; break;
+                    case 'E': next_pos.j--; break;
+                    case 'D': next_pos.j++; break;
+                }
+                // Atualiza a posição apenas se o movimento realmente foi válido.
+                // Isso guia a geração de movimentos válidos em sequência.
+                if(next_pos.i < lab->n && next_pos.j < lab->m && 
+                   next_pos.i >= 0 && next_pos.j >= 0 && 
+                   lab->labirinto[next_pos.i][next_pos.j] != '#') {
+                    current_pos = next_pos;
+                }
+            }
         }
+         
+        //calculando o fitness ja com os parâmetros de configuração
+        calcular_fitness(lab, &ind, config->forma_caminho, config->w_distancia);
 
-        calcular_fitness(lab, &ind);
-
+        ///////////////////////////////////////////////////////////////////////
+        //mudei na tentativ de solucionar o vazamento de memória
         if(!list_insert_end(populacao, ind)) {
+            free(ind.caminho->data);
             free(ind.caminho);
+            TNo* current = populacao->inicio;
+            //percorre e libera cada indivíduo
+            while (current != NULL){
+                TNo* next = current->prox;
+                //libera a memória do caminho 
+                free(current->info.caminho->data);
+                free(current->info.caminho);
+                free(current);
+                //libera nó da lista
+                current = next;
+            }
             free(populacao);
+            //aí sim libera a lista
             return NULL;
         }
     }
     return populacao;
 }
 
-void simular_populacao(const Labirinto* lab, TLinkedList* populacao) {
-    if(!lab || !populacao) {
+void simular_populacao(const Labirinto* lab, TLinkedList* populacao, const Config* config) {
+    if(!lab || !populacao || !config) {
         printf("Erro: Labirinto ou populacao invalidos\n");
         return;
     }
 
-    printf("\n=== Simulacao da Populacao (com Fitness) ===\n");
+     printf("\n=== Simulacao da Populacao (com Fitness) ===\n");
     printf("Posicao inicial (S): (%u, %u)\n", lab->inicio.i, lab->inicio.j);
     printf("Posicao destino (E): (%u, %u)\n", lab->saida.i, lab->saida.j);
-    printf("Penalidade por colisao: %d\n\n", lab->penalidade);
+    printf("Penalidade por colisao: %d\n", lab->penalidade); 
+    printf("Peso da Distancia (w_distancia): %d\n\n", config->w_distancia); // P MOSTRAR O BAGUIII DA CASA DAS CARAMBOLAS
 
     TNo* atual = populacao->inicio;
     int contador = 1;

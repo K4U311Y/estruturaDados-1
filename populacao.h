@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "lista.h"
-#include "config.h"
+#include "config.h" //add
 
 /**
  * Cria uma população inicial de indivíduos com caminhos aleatórios.
@@ -14,7 +14,7 @@
  * @return TLinkedList* - lista encadeada contendo a população ou NULL em caso de erro
  * @see calcular_distancia_manhattan(), TSList_create(), list_create()
  */
-TLinkedList* criar_populacao(Labirinto*, const Config*);
+TLinkedList* criar_populacao(Labirinto*, const Config*);////////////mudeei parametros
 
 /**
  * Libera toda a memória alocada para uma população.
@@ -44,5 +44,22 @@ void print_populacao(TLinkedList*);
  */
 void simular_populacao(const Labirinto*, TLinkedList*, const Config*);
 
+////////////////////////////////////////////////////////////////////
+/**
+ * Seleciona um indivíduo da população usando o método da roleta.
+ * Indivíduos com maior fitness têm maior probabilidade de serem selecionados.
+ * @param TLinkedList* populacao - Ponteiro para a lista encadeada da população.
+ * @return TNo* - Ponteiro para o nó (TNo) do indivíduo selecionado, ou NULL em caso de erro.
+ */
+TNo* selecionar_individuo_roleta(TLinkedList* populacao);
+
+/////////////////////////////////////////////////////////////////////
+/**
+ * Executa o ciclo principal do algoritmo genético para evoluir a população.
+ * @param Labirinto* lab - Ponteiro para a estrutura do labirinto.
+ * @param TLinkedList* populacao_atual - Ponteiro para a lista encadeada da população atual.
+ * @param const Config* config - Ponteiro para a estrutura de configuração.
+ */
+void evoluir_populacao(Labirinto* lab, TLinkedList* populacao_atual, const Config* config); 
 
 #endif

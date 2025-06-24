@@ -121,6 +121,100 @@ void calcular_fitness(const Labirinto* lab, Individuo* indiv, FormaCaminho forma
     indiv->fitness = (fitness > 0) ? fitness : 0; //pq fitness não  pode ser negativo
 }
 
+///////////////////////ROLETA//////////////////////////
+TNo* selecionar_individuo_roleta(TLinkedList* populacao) {
+    if (!populacao || populacao->inicio == NULL) {
+        return NULL; 
+    }
+
+    int soma_total_fitness = 0;
+    TNo* atual = populacao->inicio; // Ponteiro para percorrer a lista, começando do início
+
+    // somando os fitness
+    while (atual != NULL) {
+        soma_total_fitness += atual->info.fitness; // Adicionando o fitness do indivíduo atual
+        atual = atual->prox;                        // vai pro próximo nó da lista
+    }
+
+    // Se todos os indivíduos têm fitness 0, não há "roleta" para girar.
+    if (soma_total_fitness == 0) {
+        return populacao->inicio; 
+    }
+
+    // Sortear um valor entre 0 e (soma_total_fitness - 1)
+    int valor_sorteado = rand() % soma_total_fitness;
+    int soma_acumulada = 0;
+    atual = populacao->inicio; // Reinicia 'atual' para percorrer a lista novamente
+    while (atual != NULL) {
+        soma_acumulada += atual->info.fitness; // Adiciona o fitness do indivíduo atual à soma acumulada
+        if (soma_acumulada > valor_sorteado) { // Se a soma acumulada ultrapassou o valor sorteado, este é o indivíduo
+            return atual; // Retorna o nó do indivíduo selecionado
+        }
+        atual = atual->prox; // Avança para o próximo nó
+    }
+    return NULL; //TEMPORÁRIO
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void evoluir_populacao(Labirinto* lab, TLinkedList* populacao_atual, const Config* config) {
+    if (!lab || !populacao_atual || !config) {
+        fprintf(stderr, "Erro: Parametros inválidos para evoluir população.\n");
+        return;
+    }
+
+    printf("\n=== Iniciando o Ciclo de Evolução do Algoritmo Genético ===\n");
+    printf("Numero maximo de geracoes: %d\n", config->max_gen);
+    printf("Tamanho da populacao: %d\n", config->tamanho_populacao);
+
+    // Loop principal do Algoritmo Genético
+    for (int geracao = 1; geracao <= config->max_gen; geracao++) {
+        printf("\n--- Geracao %d ---\n", geracao);
+
+        TLinkedList* nova_populacao = list_create();
+        if (!nova_populacao) {
+            fprintf(stderr, "Erro: Falha ao criar nova populacao na geracao %d\n", geracao);
+            return;
+        }
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<< FASES DO AG DENTRO DO LOOP >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+        // 1. Elitismo (copiar os melhores da populacao_atual para nova_populacao)
+        
+        //      Uma função para ordenar a populacao_atual por fitness.
+
+        //      Uma função para copiar (clonar) indivíduos e suas pilhas de caminho.
+
+        // 2. Seleção, Crossover e Mutação (para preencher o resto da nova_populacao)
+    
+        //       Chamadas a selecionar_individuo_roleta.
+        //       Implementação de uma função de Crossover.
+        //       Implementação de uma função de Mutação.
+        //       Cálculo do fitness dos novos filhos.
+
+        // 3. Substituição Geracional
+               
+        //    liberar_populacao(populacao_atual);
+        //    populacao_atual = nova_populacao; // Atualiza o ponteiro para a próxima geração
+
+        // 4. Registro de Log (CSV) - será implementado em um passo futuro
+
+        // Fim das fases do AG. Por enquanto, só um esqueleto.
+        
+        // Simular e exibir a nova geração (para depuração, pode ser removido depois)
+        // simular_populacao(lab, nova_populacao, config); // Descomentar para depuração
+        
+        // Nota: A lógica de substituição da população será inserida aqui
+        // Mas por enquanto, para compilar, manteremos `populacao_atual` sem ser liberada/substituída no loop
+        // até que tenhamos as funções de clone e ordenação.
+
+        // Retorno temporário para evitar warnings/erros de loop que não usa populacao_atual
+        // Esta parte será ajustada quando a lógica de substituição for completa.
+        // Para evitar vazamento AGORA, vamos liberar nova_populacao temporariamente.
+        liberar_populacao(nova_populacao); // Apenas para teste e evitar vazamento AGORA. REMOVER DEPOIS.
+
+    }
+}
+
 // populacao.c (função modificada)
 TLinkedList* criar_populacao(Labirinto* lab, const Config* config) {////////////////////////////
     if(!lab || !config) return NULL;

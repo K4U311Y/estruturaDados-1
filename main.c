@@ -74,8 +74,19 @@ int main() {
     //também passa o endereço completo de config
     simular_populacao(lab,populacao, &config);
 
-    // 7. Liberação de recursos
-    liberar_populacao(populacao);
+    /////////////////////////////////////////////////////////////////////////
+    printf("\n=== Iniciando o Algoritmo Genetico ===\n");
+
+    /////////////////////////////////////////////////////////////////////////
+    // 7. Executar o ciclo de evolução do Algoritmo Genético
+    // A função 'evoluir_populacao' gerencia o loop de gerações e a substituição da população.
+    evoluir_populacao(lab, populacao, &config); 
+
+    // 8. Liberação de recursos (pode precisar ser ajustada dependendo de como evoluir_populacao gerencia a populacao)
+    // Se evoluir_populacao sempre passa o 'populacao_atual' para a próxima geração,
+    // então a última 'populacao' é a que foi criada ou a que restou no final do ciclo,
+    // e precisa ser liberada aqui.
+    liberar_populacao(populacao); 
     liberar_matriz(labirinto, n);
     free(lab);
 

@@ -1,13 +1,19 @@
 #ifndef INDIVIDUO_H
 #define INDIVIDUO_H
+#include "lista.h"
 #include "labirinto.h"
 #include "config.h" // pra ter acesso a FormaCaminho e Config
 
 #include <stdint.h>
 #include <stdio.h>
-
+ 
 typedef struct _labirinto Labirinto;
-typedef struct _individuo Individuo;
+
+typedef struct _individuo {
+    Stack* caminho;      // Ponteiro para uma Pilha (Stack)
+    int fitness;          
+    int tamanho_caminho;  
+} Individuo; 
 
 /**
  * Gera um movimento aleatório para o caminho.
@@ -39,6 +45,16 @@ Posicao simular_movimentos(const Labirinto*, Individuo*, int*, char**);
  * @param int w_distancia - o peso da distancia, lido do arquivo configuração
  */
 void calcular_fitness(const Labirinto*, Individuo*, FormaCaminho, int);
+
+///////////////////////////////////////////////////////////////////////////
+/**
+ * Clona um indivíduo existente (cópia profunda).
+ * Cria um novo indivíduo e copia todos os dados, incluindo o caminho (pilha).
+ * @param const Individuo* original - Ponteiro para o indivíduo a ser clonado.
+ * @return Individuo - Uma nova estrutura Individuo com dados copiados, ou um indivíduo vazio em caso de falha.
+ */
+Individuo individuo_clone(const Individuo* original); 
+
 
 
 #endif

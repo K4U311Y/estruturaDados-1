@@ -136,3 +136,40 @@ void Stack_print(Stack* pilha) {
     }
     printf("]");
 }
+
+//////////////////////////////////////////////////////////////
+Individuo individuo_clone(const Individuo* original) {
+    Individuo clone;
+    // Inicializa o clone com valores padrão em caso de falha ou para clareza
+    clone.caminho = NULL;
+    clone.fitness = 0;
+    clone.tamanho_caminho = 0;
+
+    if (original == NULL) {
+        return clone; // Retorna um indivíduo vazio se o original for nulo
+    }
+
+    // 1. Copiar os membros simples
+    clone.fitness = original->fitness;
+    clone.tamanho_caminho = original->tamanho_caminho;
+
+    // 2. Copiar a pilha (Stack) de caminho (cópia profunda)
+    if (original->caminho != NULL) {
+        clone.caminho = Stack_create(original->caminho->capacidade); // Aloca uma NOVA Stack para o clone, com a mesma capacidade da pilha original.
+        if (clone.caminho == NULL) {
+            // Falha na alocação retorna o clone parcialmente preenchido
+            return clone; 
+        }
+
+        // Copia os dados da pilha elemento por elemento
+        for (uint i = 0; i < original->caminho->qty; i++) {
+            Stack_push(clone.caminho, original->caminho->data[i]); // Usa Stack_push para copiar os elementos
+        }
+        
+        clone.caminho->qty = original->caminho->qty; //Garante que a quantidade de elementos na nova pilha seja a mesma da original
+
+    } else {
+        clone.caminho = NULL; // Se o original não tinha caminho, o clone também não terá
+    }
+    return clone;
+}

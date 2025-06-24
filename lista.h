@@ -1,6 +1,6 @@
 #ifndef LISTA_H
 #define LISTA_H
-#include "individuo.h"
+
 #include<stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -14,14 +14,22 @@ typedef struct _stack{
     //topo = elemento no indice qty-1
 } Stack;
 
+typedef struct _labirinto Labirinto;
 struct _individuo {
     Stack* caminho;      // Lista de movimentos ('C', 'B', 'E', 'D')
     int fitness;          // Valor que indica a qualidade da solução
     int tamanho_caminho;  // Número de movimentos no caminho
+} Individuo;
+
+struct _individuo {
+    Stack* caminho;      // Lista de movimentos ('C', 'B', 'E', 'D')
+   int fitness;          // Valor que indica a qualidade da solução
+    int tamanho_caminho;  // Número de movimentos no caminho
 };
 
+///////////////////////////////////////////////////
 typedef struct _no {
-    Individuo info;
+    Individuo *info; // <<< MUDANÇA CRÍTICA: AGORA É UM PONTEIRO PARA INDIVIDUO
     struct _no *prox;
 } TNo;
 
